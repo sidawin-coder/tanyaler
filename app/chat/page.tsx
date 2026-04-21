@@ -27,7 +27,7 @@ function ChatContent() {
   const inputRef = useRef<HTMLInputElement>(null);
   const searchParams = useSearchParams();
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error, reload, setMessages } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, append, isLoading, error, reload, setMessages } = useChat({
     api: '/api/chat',
     body: { language: lang },
     onFinish: () => {
@@ -85,17 +85,8 @@ function ChatContent() {
     zh: ['如何注册ePerolehan', '如何续期MOF证书', '如何提交报价', '为什么招标被拒绝？', '如何提交履约'],
   };
 
-
-    const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
-    handleInputChange({ target: { value: q } } as React.ChangeEvent<HTMLInputElement>);
-    setTimeout(() => {
-      const event = new Event('submit') as unknown as React.FormEvent;
-const sendQuickQuestion = (q: string) => {
-    handleInputChange({ target: { value: q } } as React.ChangeEvent<HTMLInputElement>);
-    setTimeout(() => {
-      const form = document.querySelector('form');
-      if (form) form.requestSubmit();
-    }, 50);
+  const sendQuickQuestion = (q: string) => {
+    append({ role: 'user', content: q });
   };
 
   const langs: { code: Language; label: string }[] = [
