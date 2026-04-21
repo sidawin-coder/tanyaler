@@ -85,12 +85,20 @@ function ChatContent() {
     zh: ['如何注册ePerolehan', '如何续期MOF证书', '如何提交报价', '为什么招标被拒绝？', '如何提交履约'],
   };
 
-  const sendQuickQuestion = async (q: string) => {
+
     const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
     handleInputChange({ target: { value: q } } as React.ChangeEvent<HTMLInputElement>);
     setTimeout(() => {
       const event = new Event('submit') as unknown as React.FormEvent;
-      handleSubmit({ ...fakeEvent, target: { elements: { input: { value: q } } } } as React.FormEvent);
+const sendQuickQuestion = async (q: string) => {
+  handleInputChange({
+    target: { value: q }
+  } as React.ChangeEvent<HTMLInputElement>);
+
+  setTimeout(() => {
+    handleSubmit();
+  }, 100);
+};
     }, 100);
   };
 
