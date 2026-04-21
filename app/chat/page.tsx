@@ -90,16 +90,12 @@ function ChatContent() {
     handleInputChange({ target: { value: q } } as React.ChangeEvent<HTMLInputElement>);
     setTimeout(() => {
       const event = new Event('submit') as unknown as React.FormEvent;
-const sendQuickQuestion = async (q: string) => {
-  handleInputChange({
-    target: { value: q }
-  } as React.ChangeEvent<HTMLInputElement>);
-
-  setTimeout(() => {
-    handleSubmit();
-  }, 100);
-};
-    }, 100);
+const sendQuickQuestion = (q: string) => {
+    handleInputChange({ target: { value: q } } as React.ChangeEvent<HTMLInputElement>);
+    setTimeout(() => {
+      const form = document.querySelector('form');
+      if (form) form.requestSubmit();
+    }, 50);
   };
 
   const langs: { code: Language; label: string }[] = [
