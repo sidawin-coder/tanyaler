@@ -59,13 +59,22 @@ export async function POST(req: Request) {
     const creditType = hasFreeCredit ? 'free' : 'paid';
 
     // 5. Stream jawapan dari OpenAI
-    const result = await streamText({
-      model: openai('gpt-4o-mini'),
-      system: getSystemPrompt(language),
-      messages,
-      temperature: 0.7,
-      maxTokens: 1500,
-      onFinish: async ({ text, usage }) => {
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+const completion = await client.chat.completions.create({
+  model: "gpt-4o-mini",
+  messages,
+});
+
+const text = completion.choices[0]?.message?.content || "";
+
+return new Response(JSON.stringify({ reply: text }), {
+  headers: { "Content-Type": "application/json" },
+});
         // 6. Tolak kredit selepas jawapan selesai
         if (creditType === 'free') {
           await serviceClient
