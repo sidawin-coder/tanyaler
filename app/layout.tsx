@@ -1,43 +1,47 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Playfair_Display } from 'next/font/google';
 import './globals.css';
 
 const inter = Inter({
-  subsets: ['latin'],
   variable: '--font-inter',
+  subsets: ['latin'],
+  display: 'swap',
+});
+
+const playfair = Playfair_Display({
+  variable: '--font-playfair',
+  subsets: ['latin'],
   display: 'swap',
 });
 
 export const metadata: Metadata = {
   title: {
-    default: 'TanyaLer — Pembantu AI Sistem ePerolehan Malaysia',
+    default: 'TanyaLer — Panduan ePerolehan Malaysia yang Mudah Difahami',
     template: '%s | TanyaLer',
   },
   description:
-    'Tak faham ePerolehan? TanyaLer! Dapatkan jawapan tepat dan pantas tentang sistem ePerolehan Malaysia — cara daftar, sebut harga, tender, pemenuhan, renew sijil dan lagi. Step-by-step. Bahasa mudah.',
+    'TanyaLer membantu anda memahami sistem ePerolehan Malaysia dengan jelas dan tersusun. Direka untuk pembekal, usahawan dan pengguna baru.',
   keywords: [
-    'ePerolehan',
-    'eperolehan malaysia',
-    'cara guna eperolehan',
-    'daftar eperolehan',
-    'sebut harga eperolehan',
-    'tender kerajaan malaysia',
-    'sijil mof',
-    'renew sijil mof',
-    'pemenuhan eperolehan',
-    'katalog eperolehan',
-    'panduan eperolehan',
+    'panduan ePerolehan Malaysia',
+    'cara guna ePerolehan',
+    'bantuan ePerolehan',
+    'sistem ePerolehan Malaysia',
+    'tender kerajaan Malaysia',
+    'sebut harga kerajaan',
+    'daftar ePerolehan',
+    'sijil MOF',
+    'pemenuhan ePerolehan',
+    'pembekal kerajaan Malaysia',
     'TanyaLer',
-    'AI chatbot eperolehan',
-    'pembekal kerajaan malaysia',
   ],
   authors: [{ name: 'TanyaLer' }],
   creator: 'TanyaLer',
   publisher: 'TanyaLer',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://tanyaler.com'),
+  metadataBase: new URL('https://tanyaler.com'),
   openGraph: {
-    title: 'TanyaLer — Pembantu AI Sistem ePerolehan Malaysia',
-    description: 'Tak faham ePerolehan? TanyaLer! Jawapan step-by-step dalam bahasa mudah.',
+    title: 'TanyaLer — Panduan ePerolehan Malaysia yang Mudah Difahami',
+    description:
+      'Pembantu AI yang membantu anda memahami sistem ePerolehan dengan jelas dan tersusun.',
     url: 'https://tanyaler.com',
     siteName: 'TanyaLer',
     locale: 'ms_MY',
@@ -45,8 +49,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TanyaLer — Pembantu AI ePerolehan Malaysia',
-    description: 'Tak faham ePerolehan? TanyaLer! Step-by-step. Bahasa mudah. Pantas.',
+    title: 'TanyaLer — Panduan ePerolehan Malaysia',
+    description: 'Pembantu AI untuk sistem ePerolehan. Jelas, tersusun, mudah difahami.',
   },
   robots: {
     index: true,
@@ -54,7 +58,6 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
       'max-image-preview': 'large',
       'max-snippet': -1,
     },
@@ -63,21 +66,23 @@ export const metadata: Metadata = {
     canonical: 'https://tanyaler.com',
     languages: {
       'ms-MY': 'https://tanyaler.com',
-      'en-MY': 'https://tanyaler.com?lang=en',
-      'zh-MY': 'https://tanyaler.com?lang=zh',
     },
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <html lang="ms" className={inter.variable}>
+    <html
+      lang="ms"
+      className={`${inter.variable} ${playfair.variable} h-full antialiased`}
+    >
       <head>
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <meta name="theme-color" content="#0F2035" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* Schema.org JSON-LD untuk SEO */}
+        <meta name="theme-color" content="#10B981" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -86,16 +91,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               '@type': 'SoftwareApplication',
               name: 'TanyaLer',
               applicationCategory: 'BusinessApplication',
-              offers: { '@type': 'Offer', price: '0', priceCurrency: 'MYR' },
-              description: 'Pembantu AI untuk sistem ePerolehan Malaysia',
-              url: 'https://tanyaler.com',
-              inLanguage: ['ms', 'en', 'zh'],
               operatingSystem: 'Web Browser',
+              offers: {
+                '@type': 'Offer',
+                price: '0',
+                priceCurrency: 'MYR',
+                description: 'Percubaan percuma 8 soalan sehari',
+              },
+              description:
+                'Panduan ePerolehan Malaysia yang mudah difahami. Pembantu AI untuk pembekal dan pengguna sistem ePerolehan.',
+              url: 'https://tanyaler.com',
+              inLanguage: ['ms'],
             }),
           }}
         />
       </head>
-      <body className="bg-white text-gray-900 antialiased font-sans">
+      <body className="min-h-full flex flex-col bg-[#FDFDFD] text-slate-900 font-sans">
         {children}
       </body>
     </html>
