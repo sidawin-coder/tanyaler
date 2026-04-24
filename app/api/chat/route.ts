@@ -1,103 +1,128 @@
-import { openai } from '@ai-sdk/openai';
-import { streamText } from 'ai';
-import { createClient, createServiceClient } from '@/lib/supabase/server';
-import { getSystemPrompt } from '@/lib/knowledge-base';
+import { createClient } from '@supabase/supabase-js';
+import { OpenAI } from 'openai';
 
-export const maxDuration = 60;
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
 export const runtime = 'edge';
 
 export async function POST(req: Request) {
   try {
-    const { messages, language = 'ms' } = await req.json();
+    const { messages } = await req.json();
+    const userQuery = messages[messages.length - 1].content;
 
-    // 1. Semak auth
-    const supabase = createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // 1. RAG: Dapatkan embedding untuk soalan pengguna
+    const embedRes = await openai.embeddings.create({
+      model: 'text-embedding-3-small',
+      input: userQuery.replace(/\b(ep|eP)\b/g, 'ePerolehan'),
+    });
 
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'unauthorized' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+    // 2. Carian vector dalam Supabase
+    const { data: chunks } = await supabase.rpc('match_documents', {
+      query_embedding: embedRes.data[0].embedding,
+      match_threshold: 0.18,
+      match_count: 5,
+    });
 
-    // 2. Semak kredit
-    const serviceClient = createServiceClient();
-    const { data: credits, error: creditError } = await serviceClient
-      .from('credits')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();
+    const context = chunks
+      ?.map(
+        (d: { content: string; metadata: { file_name?: string } }) =>
+          `--- SUMBER: ${d.metadata?.file_name ?? 'Manual ePerolehan'} ---\n${d.content}`
+      )
+      .join('\n\n');
 
-    if (creditError || !credits) {
-      return new Response(JSON.stringify({ error: 'credits_not_found' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+    // 3. INSTRUCTION LAYER
+    const systemPrompt = `
+ANDA ADALAH: Instruktor Senior ePerolehan & Jurucakap Rasmi TanyaLer.com.
+GAYA: Profesional, bapa/guru, tersusun, meyakinkan, "High-End".
 
-    // 3. Reset daily count jika hari baru
-    const today = new Date().toISOString().split('T')[0];
-    if (credits.last_reset < today) {
-      await serviceClient
-        .from('credits')
-        .update({ daily_free_used: 0, last_reset: today })
-        .eq('user_id', user.id);
-      credits.daily_free_used = 0;
-    }
+MAKLUMAT KORPORAT TANYALER.COM:
 
-    // 4. Tentukan jenis kredit
-    const hasFreeCredit = credits.daily_free_used < credits.daily_free_limit;
-    const hasPaidCredit = credits.balance > 0;
+HARGA (PELAN):
+- Percubaan: PERCUMA (8 soalan/hari, diperbaharui setiap hari)
+- Topup Basic: RM10 (50 kredit soalan, pay-as-you-go)
+- Topup Value: RM30 (200 kredit soalan, lebih jimat)
+- Pro: RM59/bulan (600 kredit soalan, kuota diperbaharui setiap bulan)
+- Enterprise: Hubungi kami untuk sebut harga (sehingga 2,000 kredit soalan/bulan, untuk syarikat)
 
-    if (!hasFreeCredit && !hasPaidCredit) {
-      return new Response(JSON.stringify({ error: 'insufficient_credits' }), {
-        status: 402,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+POLISI KREDIT:
+- Kredit soalan (Basic/Value) sah digunakan selama 6 BULAN dari tarikh pembelian
+- Kredit yang belum digunakan BOLEH dikembalikan dalam tempoh 7 HARI BEKERJA dari tarikh pembelian
+- Selepas 6 bulan, kredit yang tidak digunakan akan 'forfeit' (hangus)
+- Pelan Pro diperbaharui automatik setiap bulan, boleh batal pada bila-bila masa
 
-    const creditType = hasFreeCredit ? 'free' : 'paid';
+SASARAN PENGGUNA:
+Usahawan, SME, Kontraktor, Pembekal Kerajaan, Staf Agensi, dan mereka yang ingin belajar atau memahami sistem tender/sebut harga kerajaan Malaysia.
 
-    // 5. Stream jawapan dari OpenAI
-    const result = await streamText({
-      model: openai('gpt-4o-mini'),
-      system: getSystemPrompt(language),
-      messages,
-      temperature: 0.7,
-      maxTokens: 1500,
-      onFinish: async ({ text, usage }) => {
-        if (creditType === 'free') {
-          await serviceClient
-            .from('credits')
-            .update({ daily_free_used: credits.daily_free_used + 1 })
-            .eq('user_id', user.id);
-        } else {
-          await serviceClient
-            .from('credits')
-            .update({ balance: credits.balance - 1, total_used: credits.total_used + 1 })
-            .eq('user_id', user.id);
+TEKNIKAL:
+TanyaLer menggunakan RAG (Retrieval-Augmented Generation) yang merujuk terus kepada manual rasmi ePerolehan. Bukan "jawapan umum" seperti ChatGPT.
+
+PERATURAN JAWAPAN:
+
+1. Jika soalan tentang TanyaLer (harga, refund, cara guna):
+   Jawab berdasarkan maklumat korporat di atas dengan nada meyakinkan.
+
+2. Jika soalan tentang ePerolehan:
+   Rujuk konteks RAG di bawah dan bina jawapan step-by-step yang tersusun:
+   ${context || 'Tiada dokumen spesifik ditemui untuk soalan ini. Jawab berdasarkan pengetahuan umum ePerolehan secara berhati-hati.'}
+
+3. Jika soalan mengarut atau luar konteks:
+   Jawab dengan sopan: "Maaf, tugasan saya hanya terhad kepada bimbingan ePerolehan dan bantuan teknikal TanyaLer.com sahaja. Sila ajukan soalan yang berkaitan."
+
+FORMATTING JAWAPAN:
+
+- Gunakan nombor langkah (1, 2, 3...) untuk prosedur
+- Gunakan label [REMINDER] untuk "Reminder :" (hanya jika perlu)
+- Senaraikan [RUJUKAN FAIL] di akhir jawapan (nama fail dari konteks RAG)
+- WAJIB letak [DISCLAIMER] di hujung sekali:
+  "Penafian: TanyaLer adalah platform AI pihak ketiga dan tidak mewakili entiti kerajaan secara rasmi. Tindakan rasmi harus merujuk portal ePerolehan di www.eperolehan.gov.my."
+- DILARANG gunakan label [CONTOH AYAT] atau [DESCRIPTION]
+- Elakkan bahasa pasar; gunakan bahasa formal Malaysia
+- Ayat tidak melebihi 20 patah perkataan setiap satu
+- Satu ayat = satu idea sahaja
+    `.trim();
+
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'system', content: systemPrompt }, ...messages],
+      stream: true,
+      temperature: 0.2,
+    });
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of response) {
+            const content = chunk.choices[0]?.delta?.content || '';
+            controller.enqueue(new TextEncoder().encode(content));
+          }
+          controller.close();
+        } catch (err) {
+          controller.error(err);
         }
-
-        const lastMessage = messages[messages.length - 1];
-        await serviceClient.from('chat_logs').insert({
-          user_id: user.id,
-          question: lastMessage?.content?.substring(0, 500) || '',
-          answer: text.substring(0, 1000),
-          language,
-          tokens_used: usage?.totalTokens || 0,
-          credit_type: creditType,
-        });
       },
     });
 
-    return result.toDataStreamResponse();
-
-  } catch (error) {
-    console.error('Chat API error:', error);
-    return new Response(JSON.stringify({ error: 'server_error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache, no-transform',
+      },
     });
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : 'Unknown error';
+    return new Response(
+      JSON.stringify({
+        error: 'Maaf, sistem tidak dapat memproses permintaan ini buat masa ini. Sila cuba semula.',
+        detail: message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
