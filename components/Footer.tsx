@@ -1,55 +1,86 @@
 import Link from 'next/link';
-import { Language, t } from '@/lib/i18n';
-import { MessageSquare, Shield, Mail, Phone } from 'lucide-react';
+import Logo from './Logo';
 
-interface FooterProps { lang: Language; }
+export default function Footer() {
+  const year = new Date().getFullYear();
 
-export default function Footer({ lang }: FooterProps) {
   return (
-    <footer className="bg-navy-950 text-gray-400">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          {/* Brand */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 bg-gold-500 rounded-lg flex items-center justify-center">
-                <MessageSquare className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-bold text-xl text-white">
-                Tanya<span className="text-gold-400">Ler</span>
-              </span>
-            </div>
-            <p className="text-sm leading-relaxed mb-4 max-w-xs">{t(lang, 'footer_desc')}</p>
-            <div className="flex items-start gap-2 bg-amber-950/30 border border-amber-900/30 rounded-xl p-3">
-              <Shield className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-amber-400">{t(lang, 'footer_not_official')}</p>
+    <footer className="bg-white border-t border-slate-100 mt-auto">
+      <div className="max-w-6xl mx-auto px-6 md:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+          {/* Brand column */}
+          <div className="md:col-span-2 space-y-5">
+            <Logo showBadge={false} href={null as unknown as string} />
+            <p className="text-sm text-slate-600 leading-relaxed max-w-sm">
+              Panduan ePerolehan Malaysia yang mudah difahami. Direka untuk membantu
+              pembekal dan pengguna sistem memahami setiap langkah dengan jelas.
+            </p>
+            <div className="inline-flex items-center gap-2 text-[10px] font-bold text-emerald-600 uppercase tracking-widest">
+              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+              Precision RAG Engine
             </div>
           </div>
 
-          {/* Links */}
+          {/* Links column */}
           <div>
-            <h3 className="font-semibold text-white mb-4 text-sm">{t(lang, 'footer_links')}</h3>
-            <ul className="space-y-3 text-sm">
-              <li><Link href="/" className="hover:text-white transition-colors">{lang === 'ms' ? 'Laman Utama' : lang === 'en' ? 'Home' : '首页'}</Link></li>
-              <li><Link href="/chat" className="hover:text-white transition-colors">{lang === 'ms' ? 'Mula Tanya' : lang === 'en' ? 'Start Asking' : '开始提问'}</Link></li>
-              <li><Link href="/pricing" className="hover:text-white transition-colors">{lang === 'ms' ? 'Harga' : lang === 'en' ? 'Pricing' : '价格'}</Link></li>
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div>
-            <h3 className="font-semibold text-white mb-4 text-sm">{t(lang, 'footer_legal')}</h3>
-            <ul className="space-y-3 text-sm">
-              <li><Link href="/disclaimer" className="hover:text-white transition-colors">{t(lang, 'footer_disclaimer')}</Link></li>
-              <li><Link href="/privacy" className="hover:text-white transition-colors">{t(lang, 'footer_privacy')}</Link></li>
-              <li><Link href="/terms" className="hover:text-white transition-colors">{t(lang, 'footer_terms')}</Link></li>
-            </ul>
-
-            <h3 className="font-semibold text-white mb-3 mt-6 text-sm">{t(lang, 'footer_contact')}</h3>
-            <ul className="space-y-2 text-sm">
+            <h3 className="text-[11px] font-bold text-slate-900 uppercase tracking-widest mb-5">
+              Laman
+            </h3>
+            <ul className="space-y-3 text-sm text-slate-600">
               <li>
-                <a href="mailto:support@tanyaler.com" className="flex items-center gap-2 hover:text-white transition-colors">
-                  <Mail className="w-3.5 h-3.5" />
+                <Link href="/" className="hover:text-emerald-700 transition-colors">
+                  Laman Utama
+                </Link>
+              </li>
+              <li>
+                <Link href="/chat" className="hover:text-emerald-700 transition-colors">
+                  Mula Tanya
+                </Link>
+              </li>
+              <li>
+                <Link href="/pricing" className="hover:text-emerald-700 transition-colors">
+                  Harga
+                </Link>
+              </li>
+              <li>
+                <Link href="/manual" className="hover:text-emerald-700 transition-colors">
+                  Manual Pengguna
+                </Link>
+              </li>
+              <li>
+                <Link href="/support" className="hover:text-emerald-700 transition-colors">
+                  Support Hub
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Legal column */}
+          <div>
+            <h3 className="text-[11px] font-bold text-slate-900 uppercase tracking-widest mb-5">
+              Undang-undang
+            </h3>
+            <ul className="space-y-3 text-sm text-slate-600">
+              <li>
+                <Link href="/disclaimer" className="hover:text-emerald-700 transition-colors">
+                  Penafian
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy" className="hover:text-emerald-700 transition-colors">
+                  Dasar Privasi
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="hover:text-emerald-700 transition-colors">
+                  Terma Penggunaan
+                </Link>
+              </li>
+              <li>
+                <a
+                  href="mailto:support@tanyaler.com"
+                  className="hover:text-emerald-700 transition-colors"
+                >
                   support@tanyaler.com
                 </a>
               </li>
@@ -57,19 +88,27 @@ export default function Footer({ lang }: FooterProps) {
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="border-t border-navy-800 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-xs">
-            © {new Date().getFullYear()} TanyaLer. {t(lang, 'footer_rights')}
+        {/* Disclaimer banner */}
+        <div className="bg-slate-50 rounded-2xl p-5 mb-8 border border-slate-100">
+          <p className="text-xs text-slate-600 leading-relaxed">
+            <strong className="text-slate-900">Penafian:</strong> TanyaLer adalah platform AI
+            pihak ketiga yang menyediakan panduan berdasarkan maklumat awam berkaitan sistem
+            ePerolehan Malaysia. Platform ini tidak mempunyai hubungan rasmi dengan kerajaan
+            Malaysia atau sistem ePerolehan. Semua maklumat adalah untuk tujuan rujukan sahaja.
           </p>
-          <div className="flex items-center gap-4 text-xs">
-            <span className="flex items-center gap-1">
-              <Shield className="w-3 h-3 text-green-500" />
-              SSL Secured
+        </div>
+
+        {/* Bottom bar */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-slate-100">
+          <p className="text-xs text-slate-400">
+            © {year} TanyaLer. Hak cipta terpelihara.
+          </p>
+          <div className="flex items-center gap-5 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+            <span className="flex items-center gap-1.5">
+              <span className="w-1 h-1 bg-emerald-500 rounded-full" />
+              SSL Dilindungi
             </span>
-            <span className="text-navy-700">|</span>
-            <span>PDPA 2010 Compliant</span>
-            <span className="text-navy-700">|</span>
+            <span>PDPA 2010</span>
             <span>🇲🇾 Made in Malaysia</span>
           </div>
         </div>
