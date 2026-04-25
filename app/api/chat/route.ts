@@ -1,88 +1,103 @@
 import { createClient } from '@supabase/supabase-js';
 import { OpenAI } from 'openai';
 
-// Inisialisasi API
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const supabase = createClient(
-  process.env.SUPABASE_URL!, 
+  process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 export const runtime = 'edge';
 
-// WAJIB: Gunakan named export POST
 export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
     const userQuery = messages[messages.length - 1].content;
 
-    // 1. RAG: Dapatkan Embedding
     const embedRes = await openai.embeddings.create({
-      model: "text-embedding-3-small",
-      input: userQuery.replace(/\b(ep|eP)\b/g, "ePerolehan"),
+      model: 'text-embedding-3-small',
+      input: userQuery.replace(/\b(ep|eP)\b/g, 'ePerolehan'),
     });
 
-    // 2. Carian dalam Supabase
     const { data: chunks } = await supabase.rpc('match_documents', {
       query_embedding: embedRes.data[0].embedding,
       match_threshold: 0.18,
       match_count: 5,
     });
 
-    const context = chunks?.map((d: any) => 
-      `--- SUMBER: ${d.metadata.file_name} ---\n${d.content}`
-    ).join("\n\n");
+    const context = chunks
+      ?.map(
+        (d: { content: string; metadata: { file_name?: string } }) =>
+          `--- SUMBER: ${d.metadata?.file_name ?? 'Manual ePerolehan'} ---\n${d.content}`
+      )
+      .join('\n\n');
 
-    // 3. INSTRUCTION LAYER (Pakar TanyaLer & ePerolehan)
     const systemPrompt = `
-      ANDA ADALAH: Instruktor Senior ePerolehan & Jurucakap Rasmi TanyaLer.com.
-      GAYA: Profesional, bapa/guru, tersusun, "High-End".
+ANDA ADALAH: Instruktor Senior ePerolehan & Jurucakap Rasmi TanyaLer.
+GAYA: Profesional, bapa/guru, tersusun, meyakinkan.
 
-      MAKLUMAT KORPORAT TANYALER.COM:
-      - HARGA: Free (5 soalan/hari), RM5 (50 soalan), RM10 (120 soalan), Pro RM49/bulan (600 soalan), Enterprise RM99/bulan (1,500 soalan).
-      - REFUND: Tiada refund. Kredit digital sah selama MAXIMUM 1 TAHUN dari tarikh belian, selepas itu ia akan 'forfeit' (hangus).
-      - SASARAN: Usahawan, SME, Kontraktor, Staf Kerajaan, dan mereka yang ingin belajar tender/sebut harga.
-      - TEKNIKAL: Menggunakan RAG (Retrieval-Augmented Generation) merujuk manual rasmi ePerolehan.
+MAKLUMAT KORPORAT TANYALER:
 
-      PERATURAN JAWAPAN:
-      1. Jika soalan tentang TanyaLer: Jawab ikut info di atas.
-      2. Jika soalan tentang ePerolehan: Cari dalam konteks RAG: ${context || "Tiada dokumen ditemui"}.
-      3. Jika soalan mengarut/luar konteks: Jawab: "Maaf, tugasan saya hanya terhad kepada bimbingan ePerolehan dan bantuan teknikal TanyaLer.com sahaja."
+PELAN HARGA:
+- Percubaan: PERCUMA — 8 soalan sehari, diperbaharui setiap hari
+- Topup Basic: RM10 — 50 kredit soalan (sah 6 bulan)
+- Topup Value: RM30 — 200 kredit soalan (sah 6 bulan, lebih jimat)
+- Pro: RM59 sebulan — 600 kredit soalan (diperbaharui setiap bulan)
+- Enterprise: Hubungi kami — sehingga 2,000 kredit soalan sebulan
 
-      FORMATTING JAWAPAN:
-      - Gunakan label [REMINDER] untuk "Reminder : " (Hanya jika perlu).
-      - Senaraikan [RUJUKAN FAIL] di akhir jawapan.
-      - Wajib letak [DISCLAIMER] di hujung sekali: "Penafian: TanyaLer adalah platform AI pihak ketiga dan tidak mewakili entiti kerajaan secara rasmi. Tindakan rasmi harus merujuk portal ePerolehan."
-      - DILARANG guna label [CONTOH AYAT/DESCRIPTION].
-    `;
+POLISI:
+- Kredit sah 6 bulan dari tarikh pembelian
+- Refund dalam 7 hari bekerja dari tarikh pembelian
+- Pelan Pro boleh dibatal pada bila-bila masa
+- Pembayaran melalui FPX (BillPlz)
 
-    // 4. Panggil OpenAI Stream
+SASARAN: Pembekal SSM, usahawan, kontraktor, syarikat yang ingin berurusan dengan perolehan kerajaan Malaysia.
+
+PERATURAN JAWAPAN:
+1. Soalan tentang TanyaLer: Jawab berdasarkan maklumat korporat di atas.
+2. Soalan tentang ePerolehan: Gunakan konteks RAG: ${context || 'Tiada dokumen spesifik. Jawab berdasarkan pengetahuan umum ePerolehan secara berhati-hati.'}
+3. Soalan luar skop: "Maaf, saya hanya dapat membantu berkaitan ePerolehan dan TanyaLer sahaja."
+
+FORMAT JAWAPAN:
+- Gunakan nombor langkah untuk prosedur
+- Letak [RUJUKAN FAIL] di akhir jika ada rujukan dokumen
+- WAJIB letak satu baris di hujung sekali: "Penafian: TanyaLer adalah platform pihak ketiga. Tindakan rasmi sila rujuk www.eperolehan.gov.my"
+- JANGAN tulis perkataan [DISCLAIMER] — tulis terus ayat penafian sahaja
+- Bahasa formal Malaysia, ayat ringkas dan jelas
+    `.trim();
+
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...messages
-      ],
+      messages: [{ role: 'system', content: systemPrompt }, ...messages],
       stream: true,
       temperature: 0.2,
     });
 
     const stream = new ReadableStream({
       async start(controller) {
-        for await (const chunk of response) {
-          const content = chunk.choices[0]?.delta?.content || "";
-          controller.enqueue(new TextEncoder().encode(content));
+        try {
+          for await (const chunk of response) {
+            const content = chunk.choices[0]?.delta?.content || '';
+            controller.enqueue(new TextEncoder().encode(content));
+          }
+          controller.close();
+        } catch (err) {
+          controller.error(err);
         }
-        controller.close();
       },
     });
 
-    return new Response(stream);
-
-  } catch (e: any) {
-    return new Response(JSON.stringify({ error: e.message }), { 
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache, no-transform',
+      },
     });
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : 'Unknown error';
+    return new Response(
+      JSON.stringify({ error: 'Sistem tidak dapat memproses permintaan ini. Sila cuba semula.', detail: message }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
   }
 }
