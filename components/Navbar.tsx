@@ -8,8 +8,10 @@ import Logo from './Logo';
 import type { User } from '@supabase/supabase-js';
 
 const NAV_LINKS = [
+  { href: '/untuk-siapa', label: 'Untuk Siapa' },
   { href: '/pricing', label: 'Harga' },
-  { href: '/manual', label: 'Manual' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/manual', label: 'Manual Pengguna' },
   { href: '/support', label: 'Sokongan' },
 ];
 
@@ -45,7 +47,11 @@ export default function Navbar() {
     router.refresh();
   };
 
-  const isActive = (href: string) => pathname?.startsWith(href);
+  const isActive = (href: string) => {
+    if (href === '/') return pathname === '/';
+    return pathname?.startsWith(href);
+  };
+
   const firstName = user?.user_metadata?.full_name?.split(' ')[0] || 'Akaun';
   const avatarUrl = user?.user_metadata?.avatar_url;
 
@@ -60,7 +66,7 @@ export default function Navbar() {
           <Logo size={36} />
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-10">
+          <nav className="hidden lg:flex items-center gap-8">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
@@ -78,65 +84,41 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {user ? (
               <div className="flex items-center gap-3">
-                <Link
-                  href="/dashboard"
-                  className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-                >
+                <Link href="/dashboard" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
                   Dashboard
                 </Link>
                 <div className="relative group">
                   <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                     {avatarUrl ? (
-                      <img
-                        src={avatarUrl}
-                        alt={firstName}
-                        className="w-8 h-8 rounded-full object-cover ring-2 ring-slate-200"
-                      />
+                      <img src={avatarUrl} alt={firstName} className="w-8 h-8 rounded-full object-cover ring-2 ring-slate-200" />
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-sm font-bold">
                         {firstName.charAt(0).toUpperCase()}
                       </div>
                     )}
                   </button>
-                  {/* Dropdown */}
                   <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-slate-200/60 rounded-2xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                     <div className="px-4 py-3 border-b border-slate-100">
                       <p className="text-xs text-slate-500 truncate">{user.email}</p>
                     </div>
-                    <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">
-                      Dashboard
-                    </Link>
-                    <Link href="/pricing" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">
-                      Topup Kredit
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      disabled={loggingOut}
-                      className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors"
-                    >
+                    <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">Dashboard</Link>
+                    <Link href="/pricing" className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">Topup Kredit</Link>
+                    <button onClick={handleLogout} disabled={loggingOut} className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors">
                       {loggingOut ? 'Sedang log keluar...' : 'Log Keluar'}
                     </button>
                   </div>
                 </div>
-                <Link
-                  href="/chat"
-                  className="group inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all"
-                >
+                <Link href="/chat" className="group inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all">
                   Mula Tanya
-                  <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                     <path d="M1 8h14M9 2l6 6-6 6" />
                   </svg>
                 </Link>
               </div>
             ) : (
               <div className="flex items-center gap-3">
-                <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900">
-                  Log Masuk
-                </Link>
-                <Link
-                  href="/login"
-                  className="group inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all"
-                >
+                <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900">Log Masuk</Link>
+                <Link href="/login" className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all">
                   Cuba Percuma
                 </Link>
               </div>
@@ -168,20 +150,12 @@ export default function Navbar() {
             ))}
             {user ? (
               <>
-                <Link href="/dashboard" className="block px-3 py-3 rounded-xl text-base font-medium text-slate-700 hover:bg-slate-50">
-                  Dashboard
-                </Link>
-                <Link href="/chat" className="block mt-4 mx-3 bg-slate-900 text-white text-center font-semibold py-3 rounded-full">
-                  Mula Tanya →
-                </Link>
-                <button onClick={handleLogout} className="block w-full text-center mt-2 mx-3 text-rose-600 text-sm font-medium py-2">
-                  Log Keluar
-                </button>
+                <Link href="/dashboard" className="block px-3 py-3 rounded-xl text-base font-medium text-slate-700 hover:bg-slate-50">Dashboard</Link>
+                <Link href="/chat" className="block mt-4 mx-3 bg-slate-900 text-white text-center font-semibold py-3 rounded-full">Mula Tanya →</Link>
+                <button onClick={handleLogout} className="block w-full text-center mt-2 text-rose-600 text-sm font-medium py-2">Log Keluar</button>
               </>
             ) : (
-              <Link href="/login" className="block mt-4 mx-3 bg-slate-900 text-white text-center font-semibold py-3 rounded-full">
-                Log Masuk / Daftar →
-              </Link>
+              <Link href="/login" className="block mt-4 mx-3 bg-slate-900 text-white text-center font-semibold py-3 rounded-full">Log Masuk / Daftar →</Link>
             )}
           </div>
         )}
