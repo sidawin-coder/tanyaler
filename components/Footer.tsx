@@ -7,22 +7,17 @@ export default function Footer() {
   return (
     <footer className="bg-slate-50 border-t border-slate-200/60 mt-auto">
       <div className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-20">
-        {/* Main grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 mb-14">
           {/* Brand */}
-          <div className="md:col-span-5 space-y-5">
+          <div className="md:col-span-4 space-y-5">
             <Logo size={36} href={null} />
             <p className="text-[15px] leading-relaxed text-slate-600 max-w-sm">
               Panduan ePerolehan Malaysia yang mudah difahami. Direka untuk
-              pembekal baru dan pengguna sistem.
+              pembekal baru dan pengguna sistem ePerolehan.
             </p>
-
-            {/* Trust badges */}
             <div className="flex flex-wrap gap-2 pt-2">
               <div className="inline-flex items-center gap-1.5 bg-white border border-slate-200 text-xs font-medium text-slate-600 px-3 py-1.5 rounded-full">
-                <svg className="w-3 h-3 text-emerald-500" viewBox="0 0 12 12" fill="currentColor">
-                  <circle cx="6" cy="6" r="3" />
-                </svg>
+                <svg className="w-3 h-3 text-emerald-500" viewBox="0 0 12 12" fill="currentColor"><circle cx="6" cy="6" r="3" /></svg>
                 RAG Engine Aktif
               </div>
               <div className="inline-flex items-center gap-1.5 bg-white border border-slate-200 text-xs font-medium text-slate-600 px-3 py-1.5 rounded-full">
@@ -31,72 +26,65 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Spacer for desktop */}
           <div className="hidden md:block md:col-span-1" />
 
           {/* Laman */}
-          <div className="md:col-span-3">
-            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-4">
-              Laman
-            </h3>
+          <div className="md:col-span-2">
+            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-4">Laman</h3>
             <ul className="space-y-3 text-sm">
-              <li>
-                <Link href="/" className="text-slate-600 hover:text-slate-900 transition-colors">
-                  Laman Utama
-                </Link>
-              </li>
-              <li>
-                <Link href="/chat" className="text-slate-600 hover:text-slate-900 transition-colors">
-                  Mula Tanya
-                </Link>
-              </li>
-              <li>
-                <Link href="/pricing" className="text-slate-600 hover:text-slate-900 transition-colors">
-                  Harga
-                </Link>
-              </li>
-              <li>
-                <Link href="/manual" className="text-slate-600 hover:text-slate-900 transition-colors">
-                  Manual Pengguna
-                </Link>
-              </li>
-              <li>
-                <Link href="/support" className="text-slate-600 hover:text-slate-900 transition-colors">
-                  Sokongan
-                </Link>
-              </li>
+              {[
+                { href: '/', label: 'Laman Utama' },
+                { href: '/chat', label: 'Mula Tanya' },
+                { href: '/pricing', label: 'Harga' },
+                { href: '/untuk-siapa', label: 'Untuk Siapa' },
+                { href: '/blog', label: 'Blog' },
+                { href: '/manual', label: 'Manual Pengguna' },
+                { href: '/support', label: 'Sokongan' },
+              ].map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="text-slate-600 hover:text-slate-900 transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Legal */}
-          <div className="md:col-span-3">
-            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-4">
-              Perundangan
-            </h3>
+          <div className="md:col-span-2">
+            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-4">Perundangan</h3>
             <ul className="space-y-3 text-sm">
-              <li>
-                <Link href="/disclaimer" className="text-slate-600 hover:text-slate-900 transition-colors">
-                  Penafian
-                </Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="text-slate-600 hover:text-slate-900 transition-colors">
-                  Dasar Privasi
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="text-slate-600 hover:text-slate-900 transition-colors">
-                  Terma Penggunaan
-                </Link>
-              </li>
-              <li>
-                <a
-                  href="mailto:support@tanyaler.com"
-                  className="text-slate-600 hover:text-slate-900 transition-colors"
-                >
-                  Hubungi Kami
-                </a>
-              </li>
+              {[
+                { href: '/disclaimer', label: 'Penafian' },
+                { href: '/privacy', label: 'Dasar Privasi' },
+                { href: '/terms', label: 'Terma Penggunaan' },
+                { href: 'mailto:support@tanyaler.com', label: 'Hubungi Kami' },
+              ].map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="text-slate-600 hover:text-slate-900 transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Blog terkini */}
+          <div className="md:col-span-3">
+            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-4">Artikel Terkini</h3>
+            <ul className="space-y-3 text-sm">
+              {[
+                'Cara Daftar ePerolehan: Panduan Lengkap',
+                'Sijil MOF: Cara Mohon dan Renew',
+                'Tips Menang Tender Kerajaan',
+                'Kesilapan Pembekal Baru',
+              ].map((title, i) => (
+                <li key={i}>
+                  <Link href="/blog" className="text-slate-600 hover:text-slate-900 transition-colors line-clamp-2 leading-snug">
+                    {title}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
@@ -106,33 +94,21 @@ export default function Footer() {
           <div className="flex gap-3">
             <svg className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-              <line x1="12" y1="9" x2="12" y2="13" />
-              <line x1="12" y1="17" x2="12.01" y2="17" />
+              <line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
             </svg>
             <p className="text-xs md:text-sm leading-relaxed text-slate-600">
               <span className="font-semibold text-slate-900">Penafian: </span>
-              TanyaLer adalah platform pihak ketiga yang menyediakan panduan
-              berdasarkan maklumat awam sistem ePerolehan Malaysia. Kami tidak
-              mempunyai hubungan rasmi dengan Kerajaan Malaysia atau sistem
-              ePerolehan. Untuk tindakan rasmi, sila rujuk{' '}
-              <a
-                href="https://www.eperolehan.gov.my"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-emerald-700 hover:underline font-medium"
-              >
+              TanyaLer adalah platform pihak ketiga yang menyediakan panduan berdasarkan maklumat awam sistem ePerolehan Malaysia. Platform ini tidak mempunyai hubungan rasmi dengan kerajaan Malaysia atau sistem ePerolehan. Untuk tindakan rasmi, sila rujuk{' '}
+              <a href="https://www.eperolehan.gov.my" target="_blank" rel="noopener noreferrer" className="text-emerald-700 hover:underline font-medium">
                 www.eperolehan.gov.my
-              </a>
-              .
+              </a>.
             </p>
           </div>
         </div>
 
         {/* Bottom */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-slate-200/80">
-          <p className="text-xs text-slate-500">
-            © {year} TanyaLer. Hak cipta terpelihara.
-          </p>
+          <p className="text-xs text-slate-500">© {year} TanyaLer. Hak cipta terpelihara.</p>
           <div className="flex items-center gap-4 text-xs text-slate-500">
             <span className="inline-flex items-center gap-1.5">
               <svg className="w-3.5 h-3.5 text-emerald-500" viewBox="0 0 16 16" fill="currentColor">
