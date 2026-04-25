@@ -1,4 +1,4 @@
-import { createServerClient } from '@supabase/ssr';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
@@ -28,21 +28,17 @@ export async function middleware(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
-
   const { pathname } = request.nextUrl;
 
-  // Route yang memerlukan login
   const protectedRoutes = ['/dashboard', '/chat'];
   const isProtected = protectedRoutes.some((r) => pathname.startsWith(r));
 
-  // Redirect ke login kalau belum login
   if (isProtected && !user) {
     const redirectUrl = new URL('/login', request.url);
     redirectUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Redirect ke dashboard kalau dah login tapi cuba masuk /login
   if (pathname === '/login' && user) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
@@ -51,9 +47,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/dashboard/:path*',
-    '/chat/:path*',
-    '/login',
-  ],
+  matcher: ['/dashboard/:path*', '/chat/:path*', '/login'],
 };
