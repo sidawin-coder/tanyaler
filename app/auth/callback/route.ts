@@ -5,6 +5,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
+  // Ambil next param — kalau ada redirect, guna itu, kalau tak guna /dashboard
   const next = searchParams.get('next') ?? '/dashboard';
 
   if (!code) {
@@ -12,7 +13,6 @@ export async function GET(request: NextRequest) {
   }
 
   const cookieStore = await cookies();
-
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -33,8 +33,10 @@ export async function GET(request: NextRequest) {
   const { error } = await supabase.auth.exchangeCodeForSession(code);
 
   if (error) {
+    console.error('Auth callback error:', error);
     return NextResponse.redirect(`${origin}/login?error=auth_failed`);
   }
 
+  // Redirect ke page yang sepatutnya (pricing, dashboard, dll)
   return NextResponse.redirect(`${origin}${next}`);
 }
