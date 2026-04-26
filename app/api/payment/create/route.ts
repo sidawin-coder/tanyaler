@@ -1,0 +1,6 @@
+const billplzPayload = new URLSearchParams({
+  ...
+  callback_url: `${siteUrl}/api/payment/webhook`,  ← ini webhook
+  redirect_url: `${siteUrl}/payment/success?tx=${transaction.id}`,  ← ini redirect
+  ...
+});
