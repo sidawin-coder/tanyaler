@@ -1,53 +1,42 @@
-import { createClient } from '@/lib/supabase/server';
-import { createServiceClient } from '@/lib/supabase/server';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
-// Plan definitions
 const PLANS: Record<string, { name: string; amount: number; credits: number; type: string }> = {
-  basic: {
-    name: 'Topup Basic — 50 Kredit',
-    amount: 1000, // dalam sen (RM10.00)
-    credits: 50,
-    type: 'topup',
-  },
-  value: {
-    name: 'Topup Value — 200 Kredit',
-    amount: 3000, // RM30.00
-    credits: 200,
-    type: 'topup',
-  },
-  pro: {
-    name: 'Pro Plan — 600 Kredit/Bulan',
-    amount: 5900, // RM59.00
-    credits: 600,
-    type: 'pro',
-  },
+  basic: { name: 'Topup Basic — 50 Kredit', amount: 1000, credits: 50, type: 'topup' },
+  value: { name: 'Topup Value — 200 Kredit', amount: 3000, credits: 200, type: 'topup' },
+  pro: { name: 'Pro Plan — 600 Kredit/Bulan', amount: 5900, credits: 600, type: 'pro' },
 };
-
-const BILLPLZ_API_URL =
-  process.env.BILLPLZ_MODE === 'production'
-    ? 'https://www.billplz.com/api/v3'
-    : 'https://www.billplz-sandbox.com/api/v3';
 
 export async function POST(req: Request) {
   try {
     // 1. Semak auth
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 2. Dapatkan plan dari request
+    // 2. Semak env vars
+    const apiKey = process.env.BILLPLZ_API_KEY;
+    const collectionId = process.env.BILLPLZ_COLLECTION_ID;
+    const mode = process.env.BILLPLZ_MODE || 'sandbox';
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tanyaler.vercel.app';
+
+    if (!apiKey || !collectionId) {
+      console.error('Missing env vars:', { apiKey: !!apiKey, collectionId: !!collectionId });
+      return NextResponse.json({
+        error: 'Konfigurasi sistem tidak lengkap. Hubungi support@tanyaler.com'
+      }, { status: 500 });
+    }
+
+    // 3. Semak plan
     const { plan } = await req.json();
     const selectedPlan = PLANS[plan];
-
     if (!selectedPlan) {
       return NextResponse.json({ error: 'Plan tidak sah' }, { status: 400 });
     }
 
-    // 3. Dapatkan profil user
+    // 4. Dapatkan profil
     const service = await createServiceClient();
     const { data: profile } = await service
       .from('profiles')
@@ -58,12 +47,12 @@ export async function POST(req: Request) {
     const userEmail = profile?.email || user.email || '';
     const userName = profile?.full_name || 'Pengguna TanyaLer';
 
-    // 4. Buat transaction record dalam Supabase (pending)
+    // 5. Buat transaction record
     const { data: transaction, error: txError } = await service
       .from('transactions')
       .insert({
         user_id: user.id,
-        amount: selectedPlan.amount / 100, // convert sen ke RM
+        amount: selectedPlan.amount / 100,
         credits_purchased: selectedPlan.credits,
         status: 'pending',
         plan: selectedPlan.type,
@@ -72,15 +61,21 @@ export async function POST(req: Request) {
       .single();
 
     if (txError || !transaction) {
-      console.error('Transaction create error:', txError);
-      return NextResponse.json({ error: 'Gagal buat transaksi' }, { status: 500 });
+      console.error('Transaction insert error:', txError);
+      return NextResponse.json({
+        error: 'Gagal simpan transaksi: ' + (txError?.message || 'Unknown')
+      }, { status: 500 });
     }
 
-    // 5. Buat BillPlz bill
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tanyaler.vercel.app';
+    // 6. Call BillPlz API
+    const billplzUrl = mode === 'production'
+      ? 'https://www.billplz.com/api/v3/bills'
+      : 'https://www.billplz-sandbox.com/api/v3/bills';
 
-    const billplzPayload = new URLSearchParams({
-      collection_id: process.env.BILLPLZ_COLLECTION_ID!,
+    const credentials = Buffer.from(`${apiKey}:`).toString('base64');
+
+    const payload = new URLSearchParams({
+      collection_id: collectionId,
       email: userEmail,
       name: userName,
       amount: selectedPlan.amount.toString(),
@@ -93,34 +88,34 @@ export async function POST(req: Request) {
       reference_2: user.id,
     });
 
-    const apiKey = process.env.BILLPLZ_API_KEY!;
-    const credentials = Buffer.from(`${apiKey}:`).toString('base64');
+    console.log('Calling BillPlz:', { url: billplzUrl, mode, collectionId });
 
-    const billResponse = await fetch(`${BILLPLZ_API_URL}/bills`, {
+    const billResponse = await fetch(billplzUrl, {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${credentials}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: billplzPayload.toString(),
+      body: payload.toString(),
     });
 
     const billData = await billResponse.json();
+    console.log('BillPlz response:', { status: billResponse.status, data: billData });
 
     if (!billResponse.ok || !billData.url) {
-      console.error('BillPlz error:', billData);
       // Rollback transaction
       await service.from('transactions').delete().eq('id', transaction.id);
-      return NextResponse.json({ error: 'Gagal buat bil BillPlz' }, { status: 500 });
+      return NextResponse.json({
+        error: `BillPlz error: ${JSON.stringify(billData)}`
+      }, { status: 500 });
     }
 
-    // 6. Update transaction dengan BillPlz bill ID
+    // 7. Update transaction dengan bill ID
     await service
       .from('transactions')
       .update({ payment_id: billData.id })
       .eq('id', transaction.id);
 
-    // 7. Return payment URL
     return NextResponse.json({
       success: true,
       paymentUrl: billData.url,
@@ -130,7 +125,7 @@ export async function POST(req: Request) {
 
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : 'Unknown error';
-    console.error('Payment create error:', message);
-    return NextResponse.json({ error: 'Ralat sistem' }, { status: 500 });
+    console.error('Payment create catch error:', message);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
