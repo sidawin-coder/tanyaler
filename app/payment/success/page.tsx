@@ -89,11 +89,11 @@ function SuccessContent() {
             Ke Dashboard
           </Link>
           
-            href="mailto:support@tanyaler.com"
-            className="text-sm text-emerald-700 hover:text-emerald-800 font-medium"
-          >
-            Hubungi sokongan jika kredit tidak masuk &#8594;
-          </a>
+href="mailto:support@tanyaler.com"
+  className="text-sm text-emerald-700 hover:text-emerald-800 font-medium"
+>
+  Hubungi sokongan jika kredit tidak masuk
+</a>
         </div>
       </div>
     );
