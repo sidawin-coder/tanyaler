@@ -92,7 +92,7 @@ function SuccessContent() {
             href="mailto:support@tanyaler.com"
             className="text-sm text-emerald-700 hover:text-emerald-800 font-medium"
           >
-            Hubungi sokongan jika kredit tidak masuk →
+            Hubungi sokongan jika kredit tidak masuk &#8594;
           </a>
         </div>
       </div>
