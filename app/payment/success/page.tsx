@@ -9,10 +9,8 @@ function SuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const txId = searchParams.get('tx');
-
-  // BillPlz redirect params
-  const billplzId = searchParams.get('billplz[id]') || searchParams.get('billplz%5Bid%5D') || '';
-  const billplzPaid = searchParams.get('billplz[paid]') || searchParams.get('billplz%5Bpaid%5D') || '';
+  const billplzId = searchParams.get('billplz[id]') || '';
+  const billplzPaid = searchParams.get('billplz[paid]') || '';
 
   const [status, setStatus] = useState<'loading' | 'success' | 'failed'>('loading');
   const [totalCredits, setTotalCredits] = useState(0);
@@ -43,16 +41,13 @@ function SuccessContent() {
           setCreditsAdded(data.creditsAdded || 0);
           setStatus('success');
         } else {
-          console.error('Verify failed:', data);
           setStatus('failed');
         }
-      } catch (e) {
-        console.error('Verify error:', e);
+      } catch {
         setStatus('failed');
       }
     };
 
-    // Bagi 1 saat untuk BillPlz settle
     const timer = setTimeout(verifyPayment, 1000);
     return () => clearTimeout(timer);
   }, [txId, billplzId, billplzPaid, router]);
@@ -73,7 +68,7 @@ function SuccessContent() {
     return (
       <div className="text-center">
         <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <span className="text-3xl">⚠️</span>
+          <span className="text-3xl">!</span>
         </div>
         <h1 className="text-2xl font-bold text-slate-900 mb-3">
           Pembayaran diterima
@@ -88,12 +83,12 @@ function SuccessContent() {
           >
             Ke Dashboard
           </Link>
-          
-href="mailto:support@tanyaler.com"
-  className="text-sm text-emerald-700 hover:text-emerald-800 font-medium"
->
-  Hubungi sokongan jika kredit tidak masuk
-</a>
+          <a
+            href="mailto:support@tanyaler.com"
+            className="text-sm text-emerald-700 hover:text-emerald-800 font-medium"
+          >
+            Hubungi sokongan jika kredit tidak masuk
+          </a>
         </div>
       </div>
     );
@@ -101,7 +96,6 @@ href="mailto:support@tanyaler.com"
 
   return (
     <div className="text-center">
-      {/* Success icon */}
       <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
         <svg
           className="w-10 h-10 text-emerald-600"
@@ -123,7 +117,6 @@ href="mailto:support@tanyaler.com"
         Kredit telah ditambah ke akaun anda.
       </p>
 
-      {/* Credit info */}
       <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 mb-8">
         {creditsAdded > 0 && (
           <p className="text-sm font-semibold text-emerald-700 mb-1">
@@ -142,7 +135,7 @@ href="mailto:support@tanyaler.com"
           href="/chat"
           className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold px-7 py-3.5 rounded-full transition-all shadow-md"
         >
-          Mula Bertanya Sekarang →
+          Mula Bertanya Sekarang
         </Link>
         <Link
           href="/dashboard"
