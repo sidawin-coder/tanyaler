@@ -9,8 +9,14 @@ function SuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const txId = searchParams.get('tx');
-  const [status, setStatus] = useState<'loading' | 'success' | 'pending' | 'failed'>('loading');
-  const [credits, setCredits] = useState(0);
+
+  // BillPlz redirect params
+  const billplzId = searchParams.get('billplz[id]') || searchParams.get('billplz%5Bid%5D') || '';
+  const billplzPaid = searchParams.get('billplz[paid]') || searchParams.get('billplz%5Bpaid%5D') || '';
+
+  const [status, setStatus] = useState<'loading' | 'success' | 'failed'>('loading');
+  const [totalCredits, setTotalCredits] = useState(0);
+  const [creditsAdded, setCreditsAdded] = useState(0);
 
   useEffect(() => {
     if (!txId) {
@@ -18,24 +24,38 @@ function SuccessContent() {
       return;
     }
 
-    // Semak status payment selepas 2 saat (bagi webhook masa untuk proses)
-    const timer = setTimeout(async () => {
+    const verifyPayment = async () => {
       try {
-        const res = await fetch('/api/user/credits');
+        const res = await fetch('/api/payment/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            transactionId: txId,
+            billplzId: billplzId,
+            paid: billplzPaid || 'true',
+          }),
+        });
+
         const data = await res.json();
-        if (data.balance !== undefined || data.freeRemaining !== undefined) {
-          setCredits((data.balance || 0) + (data.freeRemaining || 0));
+
+        if (res.ok && data.success) {
+          setTotalCredits(data.totalCredits || 0);
+          setCreditsAdded(data.creditsAdded || 0);
           setStatus('success');
         } else {
-          setStatus('pending');
+          console.error('Verify failed:', data);
+          setStatus('failed');
         }
-      } catch {
-        setStatus('success'); // Default ke success jika API fail
+      } catch (e) {
+        console.error('Verify error:', e);
+        setStatus('failed');
       }
-    }, 2500);
+    };
 
+    // Bagi 1 saat untuk BillPlz settle
+    const timer = setTimeout(verifyPayment, 1000);
     return () => clearTimeout(timer);
-  }, [txId, router]);
+  }, [txId, billplzId, billplzPaid, router]);
 
   if (status === 'loading') {
     return (
@@ -45,6 +65,36 @@ function SuccessContent() {
           Mengesahkan pembayaran...
         </h2>
         <p className="text-slate-600">Sila tunggu sebentar.</p>
+      </div>
+    );
+  }
+
+  if (status === 'failed') {
+    return (
+      <div className="text-center">
+        <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <span className="text-3xl">⚠️</span>
+        </div>
+        <h1 className="text-2xl font-bold text-slate-900 mb-3">
+          Pembayaran diterima
+        </h1>
+        <p className="text-slate-600 mb-6">
+          Kredit anda sedang diproses. Sila semak dashboard dalam beberapa minit.
+        </p>
+        <div className="flex flex-col gap-3">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold px-7 py-3.5 rounded-full transition-all"
+          >
+            Ke Dashboard
+          </Link>
+          
+            href="mailto:support@tanyaler.com"
+            className="text-sm text-emerald-700 hover:text-emerald-800 font-medium"
+          >
+            Hubungi sokongan jika kredit tidak masuk →
+          </a>
+        </div>
       </div>
     );
   }
@@ -74,13 +124,18 @@ function SuccessContent() {
       </p>
 
       {/* Credit info */}
-      {credits > 0 && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 mb-8 inline-block">
-          <p className="text-sm text-emerald-700 font-medium mb-1">Jumlah kredit sekarang</p>
-          <p className="text-4xl font-bold text-emerald-700">{credits}</p>
-          <p className="text-sm text-emerald-600">kredit tersedia</p>
-        </div>
-      )}
+      <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 mb-8">
+        {creditsAdded > 0 && (
+          <p className="text-sm font-semibold text-emerald-700 mb-1">
+            +{creditsAdded} kredit ditambah
+          </p>
+        )}
+        <p className="text-sm text-emerald-700 font-medium mb-1">
+          Jumlah kredit sekarang
+        </p>
+        <p className="text-5xl font-bold text-emerald-700 my-2">{totalCredits}</p>
+        <p className="text-sm text-emerald-600">kredit tersedia</p>
+      </div>
 
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Link
@@ -106,7 +161,6 @@ export default function PaymentSuccessPage() {
       <header className="px-5 py-5">
         <Logo size={32} href="/" />
       </header>
-
       <main className="flex-1 flex items-center justify-center px-5 py-12">
         <div className="w-full max-w-md bg-white border border-slate-200/60 rounded-3xl p-10 shadow-sm">
           <Suspense>
