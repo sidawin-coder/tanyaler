@@ -1,17 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Logo from '@/components/Logo';
 import Link from 'next/link';
-import { Suspense } from 'react';
 
 function LoginContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const searchParams = useSearchParams();
   const supabase = createClient();
+
+  // Ambil redirect param dari URL
+  const redirectTo = searchParams.get('redirect') || '/dashboard';
 
   useEffect(() => {
     const err = searchParams.get('error');
@@ -26,7 +28,8 @@ function LoginContent() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        // Pass redirect param ke callback supaya lepas login terus ke page yang betul
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
@@ -42,32 +45,19 @@ function LoginContent() {
 
   return (
     <div className="min-h-screen bg-[#FDFDFD] flex flex-col">
-      {/* Top nav minimal */}
       <header className="px-5 py-5">
         <Logo size={32} href="/" />
       </header>
 
-      {/* Main content */}
       <main className="flex-1 flex items-center justify-center px-5 py-12">
         <div className="w-full max-w-sm">
-          {/* Card */}
           <div className="bg-white border border-slate-200/60 rounded-3xl p-8 shadow-sm">
-            {/* Icon */}
             <div className="w-14 h-14 bg-slate-50 border border-slate-200/60 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <svg
-                className="w-7 h-7 text-emerald-600"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
+              <svg className="w-7 h-7 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
             </div>
 
-            {/* Headline */}
             <h1 className="text-2xl font-bold text-slate-900 text-center mb-2 tracking-tight">
               Selamat datang ke TanyaLer
             </h1>
@@ -75,14 +65,12 @@ function LoginContent() {
               Log masuk untuk mula bertanya tentang ePerolehan.
             </p>
 
-            {/* Error message */}
             {error && (
               <div className="bg-rose-50 border border-rose-200 text-rose-700 text-sm px-4 py-3 rounded-xl mb-5">
                 {error}
               </div>
             )}
 
-            {/* Google login button */}
             <button
               onClick={handleGoogleLogin}
               disabled={loading}
@@ -101,14 +89,12 @@ function LoginContent() {
               {loading ? 'Sedang log masuk...' : 'Teruskan dengan Google'}
             </button>
 
-            {/* Divider */}
             <div className="flex items-center gap-3 my-5">
               <div className="flex-1 h-px bg-slate-200" />
-              <span className="text-xs text-slate-400 font-medium">ATAU</span>
+              <span className="text-xs text-slate-400 font-medium">PERCUMA</span>
               <div className="flex-1 h-px bg-slate-200" />
             </div>
 
-            {/* Free tier info */}
             <div className="bg-emerald-50 border border-emerald-200/60 rounded-2xl p-4">
               <div className="flex gap-3">
                 <span className="text-xl leading-none mt-0.5">🎁</span>
@@ -118,28 +104,17 @@ function LoginContent() {
                   </p>
                   <p className="text-xs text-emerald-800 leading-relaxed">
                     Daftar sekarang dan dapatkan 8 soalan percuma setiap hari.
-                    Upgrade bila anda bersedia.
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Legal */}
           <p className="text-xs text-slate-500 text-center mt-6 px-4 leading-relaxed">
             Dengan log masuk, anda bersetuju dengan{' '}
-            <Link href="/disclaimer" className="text-emerald-700 hover:underline">
-              Terma Penggunaan
-            </Link>{' '}
+            <Link href="/disclaimer" className="text-emerald-700 hover:underline">Terma Penggunaan</Link>{' '}
             dan{' '}
-            <Link href="/privacy" className="text-emerald-700 hover:underline">
-              Dasar Privasi
-            </Link>{' '}
-            kami.
-          </p>
-
-          <p className="text-xs text-slate-400 text-center mt-3">
-            TanyaLer bukan platform rasmi ePerolehan.
+            <Link href="/privacy" className="text-emerald-700 hover:underline">Dasar Privasi</Link> kami.
           </p>
         </div>
       </main>
