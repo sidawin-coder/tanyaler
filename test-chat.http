@@ -1,0 +1,11 @@
+POST http://localhost:3000/api/chat
+Content-Type: application/json
+
+{
+  "messages": [
+    { 
+      "role": "user", 
+      "content": "Macam mana nak daftar akaun MOF?" 
+    }
+  ]
+}
