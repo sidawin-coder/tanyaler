@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -9,7 +10,10 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function LoginPage() {
+function LoginContent() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/chat';
+
   const [tab, setTab] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,18 +22,25 @@ export default function LoginPage() {
   const [success, setSuccess] = useState('');
   const [busy, setBusy] = useState(false);
 
-  // ── Google Login ──
+  // Kalau dah login, redirect terus
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) window.location.href = redirectTo;
+    });
+  }, [redirectTo]);
+
+  // Google Login
   const handleGoogle = async () => {
     setBusy(true); setError('');
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/chat` },
+      options: { redirectTo: `${window.location.origin}${redirectTo}` },
     });
     if (error) setError('Gagal log masuk dengan Google. Cuba lagi.');
     setBusy(false);
   };
 
-  // ── Email Login ──
+  // Email Login
   const handleEmailLogin = async () => {
     if (!email || !password) { setError('Sila isi email dan kata laluan.'); return; }
     setBusy(true); setError('');
@@ -37,12 +48,12 @@ export default function LoginPage() {
     if (error) {
       setError('Email atau kata laluan tidak tepat. Cuba lagi.');
     } else {
-      window.location.href = '/chat';
+      window.location.href = redirectTo;
     }
     setBusy(false);
   };
 
-  // ── Register ──
+  // Register
   const handleRegister = async () => {
     if (!email || !password || !name) { setError('Sila isi semua ruangan.'); return; }
     if (password.length < 8) { setError('Kata laluan mestilah sekurang-kurangnya 8 aksara.'); return; }
@@ -54,13 +65,14 @@ export default function LoginPage() {
     if (error) {
       setError(error.message || 'Pendaftaran gagal. Cuba lagi.');
     } else {
-      setSuccess('Akaun berjaya dibuat! Sila semak email anda untuk pengesahan.');
-      setEmail(''); setPassword(''); setName('');
+      setSuccess('Akaun berjaya dibuat! Sila log masuk.');
+      setTab('login');
+      setPassword(''); setName('');
     }
     setBusy(false);
   };
 
-  // ── Forgot Password ──
+  // Forgot Password
   const handleForgotPassword = async () => {
     if (!email) { setError('Sila masukkan email anda dahulu.'); return; }
     setBusy(true); setError('');
@@ -131,9 +143,7 @@ export default function LoginPage() {
             {/* Register extra field */}
             {tab === 'register' && (
               <div className="mb-4">
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Nama Penuh
-                </label>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Penuh</label>
                 <input type="text" value={name} onChange={e => setName(e.target.value)}
                   placeholder="Nama anda"
                   className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-emerald-400 focus:bg-white transition-all"
@@ -143,9 +153,7 @@ export default function LoginPage() {
 
             {/* Email */}
             <div className="mb-4">
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                Alamat E-mel
-              </label>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Alamat E-mel</label>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)}
                 placeholder="email@syarikat.com"
                 onKeyDown={e => { if (e.key === 'Enter') tab === 'login' ? handleEmailLogin() : handleRegister(); }}
@@ -155,9 +163,7 @@ export default function LoginPage() {
 
             {/* Password */}
             <div className="mb-2">
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                Kata Laluan
-              </label>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Kata Laluan</label>
               <input type="password" value={password} onChange={e => setPassword(e.target.value)}
                 placeholder={tab === 'register' ? 'Minimum 8 aksara' : '••••••••'}
                 onKeyDown={e => { if (e.key === 'Enter') tab === 'login' ? handleEmailLogin() : handleRegister(); }}
@@ -168,8 +174,7 @@ export default function LoginPage() {
             {/* Forgot password */}
             {tab === 'login' && (
               <div className="text-right mb-5">
-                <button onClick={handleForgotPassword}
-                  className="text-xs text-emerald-700 hover:underline font-medium">
+                <button onClick={handleForgotPassword} className="text-xs text-emerald-700 hover:underline font-medium">
                   Lupa kata laluan?
                 </button>
               </div>
@@ -177,14 +182,10 @@ export default function LoginPage() {
 
             {/* Error / Success */}
             {error && (
-              <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
-                {error}
-              </div>
+              <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">{error}</div>
             )}
             {success && (
-              <div className="mb-4 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-700 text-sm">
-                {success}
-              </div>
+              <div className="mb-4 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-700 text-sm">{success}</div>
             )}
 
             {/* Submit */}
@@ -192,20 +193,17 @@ export default function LoginPage() {
               onClick={tab === 'login' ? handleEmailLogin : handleRegister}
               disabled={busy}
               className={`w-full py-3 rounded-2xl font-bold text-sm transition-all ${
-                busy ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                     : 'bg-slate-900 hover:bg-slate-800 text-white'
+                busy ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-slate-900 hover:bg-slate-800 text-white'
               }`}>
               {busy ? 'Memproses...' : tab === 'login' ? 'Log Masuk →' : 'Buat Akaun →'}
             </button>
 
-            {/* Register note */}
             {tab === 'register' && (
               <p className="text-xs text-slate-400 text-center mt-4 leading-relaxed">
                 Dengan mendaftar, anda bersetuju dengan{' '}
                 <Link href="/terms" className="text-emerald-700 underline">Terma Penggunaan</Link>
                 {' '}dan{' '}
-                <Link href="/privacy" className="text-emerald-700 underline">Dasar Privasi</Link>
-                {' '}kami.
+                <Link href="/privacy" className="text-emerald-700 underline">Dasar Privasi</Link> kami.
               </p>
             )}
           </div>
@@ -224,5 +222,17 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }
