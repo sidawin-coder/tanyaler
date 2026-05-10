@@ -41,4 +41,6 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+next-env.d.tsnext-build.zip  
+fix.py  
+fix.ps1  
