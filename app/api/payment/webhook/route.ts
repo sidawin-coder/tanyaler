@@ -1,3 +1,4 @@
+import { sendPaymentReceiptEmail } from '@/lib/email';
 import { createServiceClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { createHmac } from 'crypto';
@@ -82,6 +83,24 @@ export async function POST(req: Request) {
 
     // Sync to backend (Local PG = source of truth)
     const syncResult = await syncCreditsToBackend(userId, planType, reference1);
+    // Hantar resit emel (non-blocking — webhook tetap OK jika emel gagal)
+    try {
+      const { data: userData } = await service.auth.admin.getUserById(userId);
+      if (userData?.user?.email) {
+        await sendPaymentReceiptEmail({
+          to: userData.user.email,
+          planType,
+          amount: claimed.amount,
+          credits: creditsToAdd,
+          billId,
+          paidAt: paidAt || new Date().toISOString(),
+        });
+        console.log('Resit emel dihantar: ' + userData.user.email + ' Plan ' + planType);
+      }
+    } catch (emailErr) {
+      console.error('Email gagal (webhook OK):', emailErr);
+    }
+
 
     if (!syncResult.success) {
       console.error(`⚠️ CRITICAL: Supabase paid but backend NOT synced for ${userId}/${reference1}`);
