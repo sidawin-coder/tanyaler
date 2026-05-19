@@ -1,5 +1,3 @@
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { articles } from '@/lib/blog-data';
 import type { Metadata } from 'next';
@@ -47,7 +45,6 @@ export default function BlogPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FDFDFD]">
-      <Navbar />
 
       <main className="flex-1">
         {/* Hero */}
@@ -194,8 +191,6 @@ export default function BlogPage() {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 }

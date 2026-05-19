@@ -1,5 +1,3 @@
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 
 export const metadata = {
   title: 'Penafian — TanyaLer',
@@ -10,7 +8,6 @@ export const metadata = {
 export default function DisclaimerPage() {
   return (
     <div className="flex flex-col min-h-screen bg-[#FDFDFD]">
-      <Navbar />
 
       <main className="flex-1 py-20 md:py-28 px-5 md:px-8">
         <article className="max-w-3xl mx-auto">
@@ -27,7 +24,7 @@ export default function DisclaimerPage() {
               TanyaLer.
             </p>
             <p className="text-sm text-slate-500 mt-4">
-              Terakhir dikemaskini: 24 April 2026
+              Terakhir dikemaskini: 19 Mei 2026
             </p>
           </div>
 
@@ -179,10 +176,10 @@ export default function DisclaimerPage() {
                 Sekiranya anda mempunyai sebarang pertanyaan tentang penafian
                 ini, sila hubungi kami di{' '}
                 <a
-                  href="mailto:support@tanyaler.com"
+                  href="mailto:support@tanyaler.my"
                   className="text-emerald-700 hover:text-emerald-800 font-semibold"
                 >
-                  support@tanyaler.com
+                  support@tanyaler.my
                 </a>
                 .
               </p>
@@ -190,8 +187,6 @@ export default function DisclaimerPage() {
           </div>
         </article>
       </main>
-
-      <Footer />
     </div>
   );
 }

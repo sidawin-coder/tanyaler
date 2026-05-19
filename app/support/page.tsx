@@ -1,5 +1,3 @@
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -34,7 +32,7 @@ const faqs = [
     items: [
       {
         q: 'Berapa kredit percuma yang saya dapat setiap hari?',
-        a: 'Setiap pengguna berdaftar mendapat 8 soalan percuma setiap hari. Kredit ini diperbaharui secara automatik setiap tengah malam.',
+        a: 'Setiap pengguna berdaftar mendapat percubaan 20 kredit untuk 10 hari dari log masuk pertama. Percubaan adalah sekali sahaja per akaun — selepas itu, sila langgan plan paid.',
       },
       {
         q: 'Kredit percuma saya tidak dikemas kini, kenapa?',
@@ -42,7 +40,7 @@ const faqs = [
       },
       {
         q: 'Berapa lama kredit berbayar kekal sah?',
-        a: 'Kredit Topup Basic (RM10/50 kredit) dan Topup Value (RM30/200 kredit) sah selama 6 bulan dari tarikh pembelian. Kredit Pro diperbaharui setiap bulan.',
+        a: 'Plan Rintis (RM39/50 kredit) sah 45 hari. Strategis (RM89/200 kredit) sah 120 hari dengan rollover. Prestij (RM199/500 kredit) sah 250 hari dengan rollover. Rollover bermaksud baki dibawa ke hadapan apabila renew sebelum tempoh tamat.',
       },
       {
         q: 'Adakah saya boleh mendapat bayaran balik?',
@@ -88,7 +86,6 @@ const faqs = [
 export default function SokonganPage() {
   return (
     <div className="flex flex-col min-h-screen bg-[#FDFDFD]">
-      <Navbar />
 
       <main className="flex-1">
         {/* Hero */}
@@ -242,8 +239,6 @@ export default function SokonganPage() {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 }

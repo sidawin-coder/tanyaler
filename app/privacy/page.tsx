@@ -1,5 +1,3 @@
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 
 export const metadata = {
   title: 'Dasar Privasi — TanyaLer',
@@ -10,7 +8,6 @@ export const metadata = {
 export default function PrivacyPage() {
   return (
     <div className="flex flex-col min-h-screen bg-[#FDFDFD]">
-      <Navbar />
 
       <main className="flex-1 py-20 md:py-28 px-5 md:px-8">
         <article className="max-w-3xl mx-auto">
@@ -26,7 +23,7 @@ export default function PrivacyPage() {
               Perlindungan Data Peribadi Malaysia 2010.
             </p>
             <p className="text-sm text-slate-500 mt-4">
-              Terakhir dikemaskini: 24 April 2026
+              Terakhir dikemaskini: 19 Mei 2026
             </p>
           </div>
 
@@ -112,7 +109,7 @@ export default function PrivacyPage() {
                   <strong>BillPlz</strong> — memproses pembayaran sahaja
                 </li>
                 <li>
-                  <strong>Vercel</strong> — hosting platform
+                  <strong>DigitalOcean (Singapore)</strong> — hosting platform
                 </li>
               </ul>
             </section>
@@ -134,10 +131,10 @@ export default function PrivacyPage() {
               <p className="text-slate-700 leading-relaxed mt-4">
                 Untuk melaksanakan hak-hak ini, sila hubungi{' '}
                 <a
-                  href="mailto:support@tanyaler.com"
+                  href="mailto:support@tanyaler.my"
                   className="text-emerald-700 hover:text-emerald-800 font-semibold"
                 >
-                  support@tanyaler.com
+                  support@tanyaler.my
                 </a>
                 .
               </p>
@@ -178,18 +175,16 @@ export default function PrivacyPage() {
                   TanyaLer Support
                 </p>
                 <a
-                  href="mailto:support@tanyaler.com"
+                  href="mailto:support@tanyaler.my"
                   className="text-emerald-700 hover:text-emerald-800"
                 >
-                  support@tanyaler.com
+                  support@tanyaler.my
                 </a>
               </div>
             </section>
           </div>
         </article>
       </main>
-
-      <Footer />
     </div>
   );
 }

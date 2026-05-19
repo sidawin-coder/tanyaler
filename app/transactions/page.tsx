@@ -1,7 +1,5 @@
 import { redirect } from 'next/navigation';
 import { createClient, createServiceClient } from '@/lib/supabase/server';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
@@ -30,6 +28,12 @@ const statusConfig: Record<string, { label: string; class: string }> = {
 };
 
 const planConfig: Record<string, { label: string; icon: string }> = {
+  // New plans (FINAL 18 Mei 2026)
+  explorer_trial: { label: 'Percubaan Explorer', icon: '🆓' },
+  rintis: { label: 'Rintis', icon: '🌱' },
+  strategis: { label: 'Strategis', icon: '⭐' },
+  prestij: { label: 'Prestij', icon: '👑' },
+  // Legacy (untuk display rekod lama jika ada)
   topup: { label: 'Topup Kredit', icon: '⚡' },
   pro: { label: 'Pro Plan', icon: '⭐' },
 };
@@ -60,7 +64,6 @@ export default async function TransactionsPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FDFDFD]">
-      <Navbar />
 
       <main className="flex-1 py-12 md:py-16 px-5 md:px-8">
         <div className="max-w-4xl mx-auto">
@@ -182,8 +185,6 @@ export default async function TransactionsPage() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

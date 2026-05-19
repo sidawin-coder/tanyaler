@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import ConditionalLayout from '@/components/ConditionalLayout';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 
@@ -87,7 +89,9 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-[#FDFDFD] text-slate-900">
-        {children}
+        <LanguageProvider>
+          <ConditionalLayout>{children}</ConditionalLayout>
+        </LanguageProvider>
       </body>
     </html>
   );

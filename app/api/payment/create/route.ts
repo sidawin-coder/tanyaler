@@ -1,73 +1,59 @@
 import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
-const PLANS: Record<string, { name: string; amount: number; credits: number; type: string }> = {
-  basic: { name: 'Topup Basic — 50 Kredit', amount: 1000, credits: 50, type: 'topup' },
-  value: { name: 'Topup Value — 200 Kredit', amount: 3000, credits: 200, type: 'topup' },
-  pro: { name: 'Pro Plan — 600 Kredit/Bulan', amount: 5900, credits: 600, type: 'pro' },
+const PLANS: Record<string, { name: string; amount: number; credits: number; days: number }> = {
+  rintis:    { name: 'Rintis — 50 Kredit / 45 Hari',      amount: 3900,  credits: 50,  days: 45 },
+  strategis: { name: 'Strategis — 200 Kredit / 120 Hari', amount: 8900,  credits: 200, days: 120 },
+  prestij:   { name: 'Prestij — 500 Kredit / 250 Hari',   amount: 19900, credits: 500, days: 250 },
 };
 
 export async function POST(req: Request) {
   try {
-    // 1. Semak auth
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 2. Semak env vars
     const apiKey = process.env.BILLPLZ_API_KEY;
     const collectionId = process.env.BILLPLZ_COLLECTION_ID;
     const mode = process.env.BILLPLZ_MODE || 'sandbox';
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tanyaler.vercel.app';
+    const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://tanyaler.my';
 
     if (!apiKey || !collectionId) {
-      console.error('Missing env vars:', { apiKey: !!apiKey, collectionId: !!collectionId });
-      return NextResponse.json({
-        error: 'Konfigurasi sistem tidak lengkap. Hubungi support@tanyaler.com'
-      }, { status: 500 });
+      console.error('Missing BillPlz env vars');
+      return NextResponse.json({ error: 'Konfigurasi sistem tidak lengkap. Hubungi support@tanyaler.my' }, { status: 500 });
     }
 
-    // 3. Semak plan
     const { plan } = await req.json();
     const selectedPlan = PLANS[plan];
     if (!selectedPlan) {
       return NextResponse.json({ error: 'Plan tidak sah' }, { status: 400 });
     }
 
-    // 4. Dapatkan profil
+    // User info dari auth (no profiles table)
+    const userEmail = user.email || '';
+    const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Pengguna TanyaLer';
+
+    // Create transaction (correct Supabase schema)
     const service = await createServiceClient();
-    const { data: profile } = await service
-      .from('profiles')
-      .select('email, full_name')
-      .eq('id', user.id)
-      .single();
-
-    const userEmail = profile?.email || user.email || '';
-    const userName = profile?.full_name || 'Pengguna TanyaLer';
-
-    // 5. Buat transaction record
     const { data: transaction, error: txError } = await service
       .from('transactions')
       .insert({
         user_id: user.id,
         amount: selectedPlan.amount / 100,
-        credits_purchased: selectedPlan.credits,
+        credits: selectedPlan.credits,
         status: 'pending',
-        plan: selectedPlan.type,
+        plan: plan,
       })
       .select()
       .single();
 
     if (txError || !transaction) {
       console.error('Transaction insert error:', txError);
-      return NextResponse.json({
-        error: 'Gagal simpan transaksi: ' + (txError?.message || 'Unknown')
-      }, { status: 500 });
+      return NextResponse.json({ error: 'Gagal simpan transaksi: ' + (txError?.message || 'Unknown') }, { status: 500 });
     }
 
-    // 6. Call BillPlz API
     const billplzUrl = mode === 'production'
       ? 'https://www.billplz.com/api/v3/bills'
       : 'https://www.billplz-sandbox.com/api/v3/bills';
@@ -88,33 +74,22 @@ export async function POST(req: Request) {
       reference_2: user.id,
     });
 
-    console.log('Calling BillPlz:', { url: billplzUrl, mode, collectionId });
+    console.log('BillPlz request:', { url: billplzUrl, mode, plan, amount: selectedPlan.amount });
 
     const billResponse = await fetch(billplzUrl, {
       method: 'POST',
-      headers: {
-        'Authorization': `Basic ${credentials}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+      headers: { 'Authorization': `Basic ${credentials}`, 'Content-Type': 'application/x-www-form-urlencoded' },
       body: payload.toString(),
     });
 
     const billData = await billResponse.json();
-    console.log('BillPlz response:', { status: billResponse.status, data: billData });
 
     if (!billResponse.ok || !billData.url) {
-      // Rollback transaction
       await service.from('transactions').delete().eq('id', transaction.id);
-      return NextResponse.json({
-        error: `BillPlz error: ${JSON.stringify(billData)}`
-      }, { status: 500 });
+      return NextResponse.json({ error: `BillPlz error: ${JSON.stringify(billData)}` }, { status: 500 });
     }
 
-    // 7. Update transaction dengan bill ID
-    await service
-      .from('transactions')
-      .update({ payment_id: billData.id })
-      .eq('id', transaction.id);
+    await service.from('transactions').update({ bill_id: billData.id }).eq('id', transaction.id);
 
     return NextResponse.json({
       success: true,
@@ -122,10 +97,9 @@ export async function POST(req: Request) {
       billId: billData.id,
       transactionId: transaction.id,
     });
-
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : 'Unknown error';
-    console.error('Payment create catch error:', message);
+    console.error('Payment create error:', message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

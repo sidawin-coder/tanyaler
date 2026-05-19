@@ -1,5 +1,3 @@
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -33,7 +31,7 @@ const steps = [
     iconColor: 'bg-emerald-100',
     desc: 'Dashboard adalah pusat kawalan anda. Di sini anda dapat melihat semua maklumat penting sebelum mula bertanya.',
     items: [
-      'Kad pertama: Soalan percuma berbaki hari ini (8 soalan)',
+      'Kad pertama: Baki kredit anda — percubaan 20 kredit atau plan paid',
       'Kad kedua: Kredit berbayar yang anda ada',
       'Kad ketiga: Jumlah soalan yang pernah ditanya',
       'Butang besar: Tekan untuk mula bertanya',
@@ -81,7 +79,7 @@ const steps = [
     iconColor: 'bg-rose-100',
     desc: 'TanyaLer menggunakan sistem kredit yang telus dan adil. Anda sentiasa tahu berapa kredit yang berbaki.',
     items: [
-      'Percuma: 8 soalan setiap hari — automatik, tiada perlu topup',
+      'Percubaan: 20 kredit untuk 10 hari — uji sebelum komit, tiada kad kredit',
       'Kredit percuma diperbaharui setiap hari pada tengah malam',
       'Kredit berbayar tidak luput sehingga 6 bulan',
       'Lihat baki kredit di header chat atau di Dashboard',
@@ -98,12 +96,12 @@ const steps = [
     desc: 'Apabila soalan percuma habis atau anda memerlukan lebih akses, topup kredit adalah mudah dan selamat.',
     items: [
       'Pergi ke halaman Harga (/pricing)',
-      'Pilih pelan yang sesuai (Basic RM10, Value RM30, atau Pro RM59/bulan)',
+      'Pilih plan yang sesuai (Rintis RM39, Strategis RM89, atau Prestij RM199)',
       'Klik butang pelan yang dipilih',
       'Bayar menggunakan FPX (internet banking Malaysia)',
       'Kredit ditambah automatik selepas bayaran disahkan',
     ],
-    tip: 'Pelan Value (RM30 = 200 kredit) adalah pilihan paling berbaloi untuk pengguna sederhana.',
+    tip: 'Plan Strategis (RM89 = 200 kredit, 120 hari, rollover ✅) adalah pilihan paling berbaloi untuk vendor aktif.',
   },
   {
     num: '07',
@@ -144,7 +142,6 @@ const steps = [
 export default function ManualPage() {
   return (
     <div className="flex flex-col min-h-screen bg-[#FDFDFD]">
-      <Navbar />
 
       <main className="flex-1">
         {/* Hero */}
@@ -253,7 +250,7 @@ export default function ManualPage() {
             </h2>
             <div className="space-y-3">
               {[
-                { q: 'Adakah saya perlu bayar untuk mendaftar?', a: 'Tidak. Pendaftaran adalah percuma dan anda mendapat 8 soalan percuma setiap hari tanpa perlu memasukkan maklumat kad kredit.' },
+                { q: 'Adakah saya perlu bayar untuk mendaftar?', a: 'Tidak. Pendaftaran adalah percuma dan anda mendapat percubaan 20 kredit untuk 10 hari tanpa perlu memasukkan maklumat kad kredit.' },
                 { q: 'Kredit percuma saya tidak diperbaharui, kenapa?', a: 'Kredit percuma diperbaharui pada tengah malam setiap hari. Cuba log keluar dan log masuk semula jika masih tidak dikemas kini.' },
                 { q: 'Bolehkah saya guna TanyaLer dalam bahasa lain?', a: 'Ya! Anda boleh bertanya dalam Bahasa Malaysia, English, atau Bahasa Cina. Sistem akan memahami dan menjawab dalam bahasa yang anda gunakan.' },
                 { q: 'Adakah maklumat yang saya tanya disimpan?', a: 'Soalan anda diproses untuk menghasilkan jawapan tetapi tidak dikongsi kepada pihak lain. Sila baca Dasar Privasi kami untuk maklumat lanjut.' },
@@ -280,7 +277,7 @@ export default function ManualPage() {
               Sudah faham? Jom mula!
             </h2>
             <p className="text-slate-600 mb-8">
-              8 soalan percuma menunggu anda. Tiada kad kredit diperlukan.
+              20 kredit percubaan menunggu anda. 10 hari · Tiada kad kredit diperlukan.
             </p>
             <a
               href="/chat"
@@ -291,8 +288,6 @@ export default function ManualPage() {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 }

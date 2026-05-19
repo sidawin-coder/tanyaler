@@ -1,17 +1,14 @@
 import Link from 'next/link';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 
 export const metadata = {
-  title: 'TanyaLer — Panduan ePerolehan Malaysia yang Mudah Difahami',
+  title: 'TanyaLer — AI Rujukan ePerolehan Malaysia untuk Vendor MOF',
   description:
-    'Tak faham ePerolehan? TanyaLer bantu anda dengan panduan langkah demi langkah, disokong dokumen rasmi, dijelaskan dalam bahasa mudah. Direka untuk pembekal baru SSM.',
+    'Pening dengan 7,375 muka surat ePerolehan? TanyaLer beri jawapan tepat dalam saat. AI khas untuk vendor ePerolehan Malaysia — berdasarkan 59 dokumen rasmi MOF, Treasury, ePerolehan. Cuba 20 kredit percuma 10 hari.',
 };
 
 export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen bg-[#FDFDFD]">
-      <Navbar />
 
       {/* ═══════════════════════════════════════════
           HERO — Generous whitespace, bold typography
@@ -24,29 +21,32 @@ export default function HomePage() {
           {/* Eyebrow badge */}
           <div className="inline-flex items-center gap-2 bg-white border border-slate-200/80 text-xs font-medium text-slate-700 px-3 py-1.5 rounded-full mb-8 shadow-sm">
             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-            Disokong 4,000+ muka surat dokumen rasmi ePerolehan
+            Berdasarkan 7,375 muka surat dari 59 dokumen rasmi MOF, Treasury & ePerolehan
           </div>
 
           {/* Hero headline */}
           <h1 className="text-[44px] leading-[1.05] sm:text-6xl md:text-7xl lg:text-[84px] lg:leading-[0.95] font-bold tracking-[-0.03em] text-slate-900 mb-8 text-balance">
-            Tak faham ePerolehan?
+            Pening dengan
             <br />
-            <span className="text-emerald-600">TanyaLer.</span>
+            ePerolehan?
+            <br />
+            <span className="text-emerald-600">TanyaLer jawab.</span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto mb-10">
-            Pembantu AI peribadi anda untuk memahami sistem ePerolehan Malaysia.
-            Jawapan tepat. Langkah demi langkah. Dalam bahasa yang mudah difahami.
+            Sistem rujukan pintar untuk vendor ePerolehan Malaysia.
+            Berdasarkan 59 dokumen rasmi MOF, Treasury & ePerolehan.
+            Jawapan dalam saat. Bahasa Malaysia mudah. Sumber boleh disahkan.
           </p>
 
           {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-6">
             <Link
-              href="/chat"
+              href="/login"
               className="group inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-base font-semibold px-7 py-4 rounded-full shadow-lg hover:shadow-xl transition-all w-full sm:w-auto justify-center"
             >
-              Mulakan Percuma
+              Mulakan Percubaan Percuma
               <svg
                 className="w-4 h-4 transition-transform group-hover:translate-x-1"
                 viewBox="0 0 16 16"
@@ -67,7 +67,7 @@ export default function HomePage() {
           </div>
 
           <p className="text-sm text-slate-500">
-            8 soalan percuma setiap hari · Tiada kad kredit diperlukan
+            20 kredit percuma · 10 hari · Tiada kad kredit diperlukan
           </p>
         </div>
       </section>
@@ -198,182 +198,90 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════
-          TESTIMONIALS — Social Proof
+          USE CASES — Cara TanyaLer Membantu (18 Mei 2026: replaces fake testimonials)
           ═══════════════════════════════════════════ */}
       <section className="py-20 md:py-28 px-5 md:px-8 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <div className="text-sm font-semibold text-emerald-700 uppercase tracking-wider mb-3">
-              Kata Pengguna
+              Cara TanyaLer Membantu
             </div>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-slate-900 mb-4 text-balance">
-              Dipercayai pembekal Malaysia.
+              Scenario penggunaan biasa.
             </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Contoh bagaimana TanyaLer membantu vendor ePerolehan Malaysia setiap hari.
+            </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {/* Testimonial 1 */}
+
             <div className="bg-slate-50/80 border border-slate-200/60 rounded-3xl p-7">
-              <div className="flex gap-0.5 mb-4 text-amber-400">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-slate-700 leading-relaxed mb-5 text-[15px]">
-                &ldquo;Saya baru daftar SSM dan terus tersadung dengan ePerolehan.
-                Hadir kursus pun masih blur. TanyaLer jawab step-by-step, terus
-                faham. Dalam masa seminggu saya berjaya sertai sebut harga
-                pertama.&rdquo;
+              <div className="text-3xl mb-4">📝</div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Vendor Baru SSM</h3>
+              <p className="text-slate-600 text-[15px] leading-relaxed">
+                Tak tahu mula dari mana untuk daftar di ePerolehan? TanyaLer beri
+                checklist langkah demi langkah dari Panduan Pendaftaran Akaun MOF rasmi.
               </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  AH
-                </div>
-                <div>
-                  <div className="font-semibold text-slate-900 text-sm">
-                    Ahmad Hakim
-                  </div>
-                  <div className="text-xs text-slate-500">
-                    Pembekal Baru · Selangor
-                  </div>
-                </div>
-              </div>
             </div>
 
-            {/* Testimonial 2 */}
             <div className="bg-slate-50/80 border border-slate-200/60 rounded-3xl p-7">
-              <div className="flex gap-0.5 mb-4 text-amber-400">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-slate-700 leading-relaxed mb-5 text-[15px]">
-                &ldquo;Sijil MOF saya nak expire, panik. Call helpdesk susah nak
-                dapat. Tanya TanyaLer, dapat checklist lengkap untuk renew.
-                Settle dalam sehari. Save masa dan tenaga.&rdquo;
+              <div className="text-3xl mb-4">🔄</div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Sijil MOF Nak Expire</h3>
+              <p className="text-slate-600 text-[15px] leading-relaxed">
+                Tanya prosedur renewal, dokumen diperlukan, dan timeline — terus
+                dari panduan rasmi. Tiada perlu call helpdesk berjam-jam.
               </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  SL
-                </div>
-                <div>
-                  <div className="font-semibold text-slate-900 text-sm">
-                    Siti Lina
-                  </div>
-                  <div className="text-xs text-slate-500">
-                    Pengurus Operasi · KL
-                  </div>
-                </div>
-              </div>
             </div>
 
-            {/* Testimonial 3 */}
             <div className="bg-slate-50/80 border border-slate-200/60 rounded-3xl p-7">
-              <div className="flex gap-0.5 mb-4 text-amber-400">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-slate-700 leading-relaxed mb-5 text-[15px]">
-                &ldquo;Tender saya asyik reject dan saya tak tahu kenapa. Tanya
-                TanyaLer dia breakdown semua punca tender tolak dan macam mana
-                nak betulkan. Tender berikutnya terus lulus.&rdquo;
+              <div className="text-3xl mb-4">🎯</div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Tender Asyik Ditolak</h3>
+              <p className="text-slate-600 text-[15px] leading-relaxed">
+                Pelajari punca biasa tender reject — format dokumen, syarat
+                kelayakan, kesilapan submission. Betulkan untuk percubaan seterusnya.
               </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  RN
-                </div>
-                <div>
-                  <div className="font-semibold text-slate-900 text-sm">
-                    Razif Nordin
-                  </div>
-                  <div className="text-xs text-slate-500">
-                    Kontraktor · Johor
-                  </div>
-                </div>
-              </div>
             </div>
 
-            {/* Testimonial 4 */}
             <div className="bg-slate-50/80 border border-slate-200/60 rounded-3xl p-7">
-              <div className="flex gap-0.5 mb-4 text-amber-400">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-slate-700 leading-relaxed mb-5 text-[15px]">
-                &ldquo;Baca manual 500 muka surat memang pening. TanyaLer
-                ringkaskan info penting dan bagi contoh sebenar. Macam ada
-                mentor peribadi. Worth every ringgit.&rdquo;
+              <div className="text-3xl mb-4">📚</div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Manual Terlalu Tebal</h3>
+              <p className="text-slate-600 text-[15px] leading-relaxed">
+                7,375 muka surat dokumen tak perlu dibaca semua. Tanya soalan
+                spesifik, dapat jawapan spesifik dengan rujukan ke sumber relevan.
               </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  NF
-                </div>
-                <div>
-                  <div className="font-semibold text-slate-900 text-sm">
-                    Nurul Fatihah
-                  </div>
-                  <div className="text-xs text-slate-500">
-                    Usahawan SME · Pulau Pinang
-                  </div>
-                </div>
-              </div>
             </div>
 
-            {/* Testimonial 5 */}
             <div className="bg-slate-50/80 border border-slate-200/60 rounded-3xl p-7">
-              <div className="flex gap-0.5 mb-4 text-amber-400">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-slate-700 leading-relaxed mb-5 text-[15px]">
-                &ldquo;Katalog saya reject tiga kali. Setelah guna TanyaLer, saya
-                faham apa yang perlu ada dan format yang betul. Approve first
-                try. Highly recommended untuk pembekal baru.&rdquo;
+              <div className="text-3xl mb-4">🏷️</div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Katalog Reject Berulang</h3>
+              <p className="text-slate-600 text-[15px] leading-relaxed">
+                Fahami klasifikasi UNSPSC, format katalog, dan syarat khusus.
+                Berdasarkan Panduan Padanan Kod Bidang ePerolehan rasmi.
               </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-rose-400 to-rose-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  KC
-                </div>
-                <div>
-                  <div className="font-semibold text-slate-900 text-sm">
-                    Kevin Chin
-                  </div>
-                  <div className="text-xs text-slate-500">
-                    Pengarah Syarikat · Melaka
-                  </div>
-                </div>
-              </div>
             </div>
 
-            {/* Stat card */}
             <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-3xl p-7 text-white flex flex-col justify-between min-h-[240px]">
               <div>
-                <div className="text-5xl font-bold mb-2 tracking-tight">98%</div>
-                <div className="text-emerald-100 text-sm font-medium">
-                  Pengguna dapat jawapan pada percubaan pertama
+                <div className="text-5xl font-bold mb-3 tracking-tight">59</div>
+                <div className="text-emerald-100 text-sm font-medium mb-1">
+                  Dokumen rasmi terindeks
+                </div>
+                <div className="text-emerald-200/90 text-xs leading-relaxed">
+                  7,375 muka surat · 27,820 chunks
+                  <br />
+                  MOF · Treasury · ePerolehan
                 </div>
               </div>
               <Link
-                href="/chat"
+                href="/login"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-white hover:gap-3 transition-all"
               >
                 Cuba sekarang
                 <span>→</span>
               </Link>
             </div>
+
           </div>
         </div>
       </section>
@@ -388,22 +296,22 @@ export default function HomePage() {
               Harga Telus
             </div>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-slate-900 mb-4 text-balance">
-              Mulakan percuma.
+              Mulakan percubaan percuma.
               <br />
-              Upgrade bila perlu.
+              Upgrade bila yakin.
             </h2>
             <p className="text-lg text-slate-600 max-w-xl mx-auto">
-              8 soalan percuma setiap hari. Topup tanpa kontrak. Pro plan untuk
-              pengguna aktif.
+              20 kredit percuma untuk 10 hari. Plan paid mulai RM39.
+              Tiada langganan bulanan.
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {[
-              { name: 'Percubaan', price: 'RM0', unit: '/hari', desc: '8 soalan' },
-              { name: 'Basic', price: 'RM10', unit: '', desc: '50 kredit' },
-              { name: 'Value', price: 'RM30', unit: '', desc: '200 kredit', popular: false },
-              { name: 'Pro', price: 'RM59', unit: '/bulan', desc: '600 kredit', popular: true },
+              { name: 'Explorer', price: 'RM0', unit: '/10 hari', desc: '20 kredit' },
+              { name: 'Rintis', price: 'RM39', unit: '/45 hari', desc: '50 kredit' },
+              { name: 'Strategis', price: 'RM89', unit: '/120 hari', desc: '200 kredit', popular: true },
+              { name: 'Prestij', price: 'RM199', unit: '/250 hari', desc: '500 kredit' },
             ].map((plan) => (
               <div
                 key={plan.name}
@@ -461,14 +369,14 @@ export default function HomePage() {
       <section className="py-20 md:py-28 px-5 md:px-8 bg-slate-900 text-white text-center">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-5 text-balance">
-            Jom mula, percuma.
+            Cuba 10 hari. Percuma.
           </h2>
           <p className="text-lg md:text-xl text-slate-300 mb-10 max-w-xl mx-auto">
-            Tanya soalan pertama anda hari ini. Tidak perlu kad kredit, tidak
-            perlu komitmen.
+            20 kredit untuk uji kualiti jawapan TanyaLer.
+            Tiada kad kredit. Tiada komitmen. Decide bila anda dah yakin.
           </p>
           <Link
-            href="/chat"
+            href="/login"
             className="group inline-flex items-center gap-2 bg-white text-slate-900 text-base font-semibold px-8 py-4 rounded-full shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02]"
           >
             Mulakan Sekarang
@@ -484,12 +392,11 @@ export default function HomePage() {
             </svg>
           </Link>
           <p className="text-sm text-slate-400 mt-6">
-            8 soalan percuma · Tiada kad kredit diperlukan
+            20 kredit · 10 hari · Tiada kad kredit diperlukan
           </p>
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 }

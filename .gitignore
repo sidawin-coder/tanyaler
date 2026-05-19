@@ -35,3 +35,7 @@ next-env.d.ts
 .DS_Store
 *.pem
 Thumbs.db
+
+# Backup files (auto-generated)
+*.backup_*
+.env.local.backup_*

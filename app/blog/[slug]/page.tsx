@@ -1,6 +1,4 @@
 import { notFound } from 'next/navigation';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { articles, getArticleBySlug, getRelatedArticles } from '@/lib/blog-data';
 import type { Metadata } from 'next';
@@ -95,7 +93,6 @@ export default async function ArticlePage({ params }: Props) {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FDFDFD]">
-      <Navbar />
 
       <main className="flex-1">
         {/* Article header */}
@@ -188,8 +185,6 @@ export default async function ArticlePage({ params }: Props) {
           </section>
         )}
       </main>
-
-      <Footer />
     </div>
   );
 }

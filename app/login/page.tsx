@@ -103,7 +103,7 @@ function LoginContent() {
                     Percuma tanpa kad kredit
                   </p>
                   <p className="text-xs text-emerald-800 leading-relaxed">
-                    Daftar sekarang dan dapatkan 8 soalan percuma setiap hari.
+                    Daftar sekarang dan dapatkan 20 kredit percubaan untuk 10 hari.
                   </p>
                 </div>
               </div>

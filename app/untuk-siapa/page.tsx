@@ -1,5 +1,3 @@
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
@@ -128,7 +126,6 @@ const audiences = [
 export default function UntukSiapaPage() {
   return (
     <div className="flex flex-col min-h-screen bg-[#FDFDFD]">
-      <Navbar />
 
       <main className="flex-1">
         {/* Hero */}
@@ -228,7 +225,7 @@ export default function UntukSiapaPage() {
               Tanya soalan pertama anda hari ini.
             </h2>
             <p className="text-lg md:text-xl text-slate-300 mb-10 max-w-xl mx-auto">
-              Tidak perlu kad kredit, tidak perlu komitmen. 8 soalan percuma
+              Tidak perlu kad kredit, tidak perlu komitmen. 20 kredit percuma 10 hari
               setiap hari menunggu anda.
             </p>
             <Link
@@ -248,13 +245,11 @@ export default function UntukSiapaPage() {
               </svg>
             </Link>
             <p className="text-sm text-slate-400 mt-6">
-              8 soalan percuma · Tiada kad kredit · Tiada komitmen
+              20 kredit · 10 hari · Tiada kad kredit · Tiada komitmen
             </p>
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 }

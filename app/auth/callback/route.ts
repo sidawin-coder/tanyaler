@@ -1,12 +1,17 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
-  // Ambil next param — kalau ada redirect, guna itu, kalau tak guna /dashboard
   const next = searchParams.get('next') ?? '/dashboard';
+
+  // Dapatkan origin sebenar dari header (bukan dari request.url yang akan jadi localhost:3000)
+  const headersList = await headers();
+  const host = headersList.get('host') || 'tanyaler.my';
+  const proto = headersList.get('x-forwarded-proto') || 'https';
+  const origin = `${proto}://${host}`;
 
   if (!code) {
     return NextResponse.redirect(`${origin}/login?error=no_code`);
@@ -37,6 +42,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}/login?error=auth_failed`);
   }
 
-  // Redirect ke page yang sepatutnya (pricing, dashboard, dll)
   return NextResponse.redirect(`${origin}${next}`);
 }
